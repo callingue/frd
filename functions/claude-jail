@@ -1,0 +1,13 @@
+emulate -L zsh
+
+local cbin=${commands[claude]}
+[[ -n $cbin ]] || { print -u2 "claude-jail: claude not found in PATH"; return 1 }
+local creal=${cbin:A}
+
+local -a cmd
+if [[ $1 == --shell ]]; then
+  shift
+  cmd=(env 'PS1=%F{red}[cjsh]%f %~%# ' /bin/zsh -f "$@")
+else
+  cmd=(claude "$@")
+fi
