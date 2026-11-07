@@ -1,0 +1,34 @@
+emulate -L zsh -o extended_glob
+
+.cj-conf-lines() {
+  emulate -L zsh -o extended_glob
+  local line key val
+  while IFS= read -r line || [[ -n $line ]]; do
+    line=${line%%\
+    [[ $line == *=* ]] || continue 
+    key=${${line%%=*}//[[:space:]]/}        
+    val=${${line#*=}##[[:space:]]#}         
+    val=${val%%[[:space:]]#}                
+    print -r -- "$key=${val/#\~/$HOME}"    
+  done < $1
+}
+
+.cj-conf-add() {
+  local kv
+  loaded+=($1)
+  for kv in ${(f)"$(.cj-conf-lines $1)"}; do
+    case ${kv%%=*} in
+      dir|level|ro|rw) conf+=($kv) ;;
+      *) print -u2 "claude-jail: $1: unknown key '${kv%%=*}'" ;;
+    esac
+  done
+}
+
+.cj-get() {
+  local -a m=(${(M)conf:#$1=*})
+  print -r -- ${m[-1]#$1=}
+}
+
+.cj-get-all() {
+  print -rl -- ${${(M)conf:#$1=*}#$1=}
+}
