@@ -10,8 +10,20 @@ pub struct Policy {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Mount {
-    Bind { src: PathBuf, dst: PathBuf, writable: bool, optional: bool },
-    Symlink { target: PathBuf, dst: PathBuf },
-    Tmpfs { dst: PathBuf },
-    Masked { dst: PathBuf },
+    Bind {
+        src: PathBuf,
+        dst: PathBuf,
+        writable: bool,
+        optional: bool,
+    },
+    Symlink {
+        target: PathBuf,
+        dst: PathBuf,
+    },
+    Tmpfs {
+        dst: PathBuf,
+    },
+    Masked {
+        dst: PathBuf,
+    },
 }
