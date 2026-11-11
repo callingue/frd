@@ -68,3 +68,63 @@ pub enum Scan {
     Hide,
     Abort,
 }
+
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Source {
+    Default,
+    Preset(u8),
+    Global(PathBuf),
+    Project(PathBuf),
+    Repo(PathBuf),
+    Cli,
+}
+
+#[derive(Debug, Clone)]
+pub struct Layer {
+    pub source: Source,
+    pub config: RawConfig,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_full_config() {
+        let raw: RawConfig = toml::from_str(
+            r#"
+            path = "/home/you/src/app"
+            level = 3
+            work = "tmp"
+            net = "allow"
+            host = ["github.com"]
+
+            [add]
+            ro = ["~/docs"]
+            "#,
+        )
+        .unwrap();
+
+        assert_eq!(raw.level, Some(3));
+        assert_eq!(raw.work, Some(Work::Tmp));
+        assert_eq!(raw.net, Some(Net::Allow));
+        assert_eq!(raw.add.unwrap().ro, Some(vec!["~/docs".to_string()]));
+    }
+
+    #[test]
+    fn empty_config_is_valid() {
+        let raw: RawConfig = toml::from_str("").unwrap();
+        assert!(raw.level.is_none());
+    }
+
+    #[test]
+    fn rejects_unknown_key() {
+        assert!(toml::from_str::<RawConfig>("lvl = 3").is_err());
+    }
+
+    #[test]
+    fn rejects_unknown_value() {
+        assert!(toml::from_str::<RawConfig>(r#"work = "dri""#).is_err());
+    }
+}
