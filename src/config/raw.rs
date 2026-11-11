@@ -69,23 +69,6 @@ pub enum Scan {
     Abort,
 }
 
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Source {
-    Default,
-    Preset(u8),
-    Global(PathBuf),
-    Project(PathBuf),
-    Repo(PathBuf),
-    Cli,
-}
-
-#[derive(Debug, Clone)]
-pub struct Layer {
-    pub source: Source,
-    pub config: RawConfig,
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
